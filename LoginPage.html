@@ -1,0 +1,62 @@
+ <body>
+ <form id="regForm" method="post" action="/">
+  <fieldset>
+   <legend>Create New Account</legend>
+   <p>
+    <label>Email Address: <input type="email" name="emailAddr" required onblur="checkExists()"
+     placeholder="An email will be sent to this address requiring you
+     to confirm its receipt to activate your account" /></label>
+   </p>
+   <p>
+    <label>Username: <input type="text" name="username" required onblur="checkAvailable()"
+     placeholder="Username must be at least 8 characters long
+     and include only letters or numbers" /></label>
+   </p>
+   <p>
+    <label>Password: <input type="password" name="pwd" required onblur="checkStrength()"
+     placeholder="Password must be at least 8 characters long
+     and include numbers and punctuation characters" /></label>
+   </p>
+   <p>
+    <label>Confirm Password: <input type="password" name="confPwd" required onblur="checkEqual()" /></label>
+   </p>
+   <p>
+     <fieldset>
+       <label><input type="checkbox" name="robotChk" onclick="notARobot()" />I'm not a robot</label>
+     </fieldset>
+  </fieldset>
+  <p>
+  <input type="reset" value="Reset" /> &nbsp;&nbsp;
+  <input type="submit" id="registerSubmit" value="Create Account"/>
+  </p>
+ </form>
+
+ <script>
+    function checkEqual() {
+      var pass = document.getElementById("pwd").value;
+      var confpass = document.getElementById("confPwd").value;
+
+      if(pass!=="" && pass === confpass) {
+        console.log("success");
+      }
+      else{
+        console.log("failure");
+        document.getElementById("pwd").value = "";
+        document.getElementById("confPwd").value = "";
+      }
+
+
+    }
+
+    // function sendData(){
+    //   console.log("In sendData");
+    //   var pass = document.getElementById("pwd").value = "";
+    //   var confpass = document.getElementById("confPwd").value;
+    //   fetch('http://localhost:8080/success.html', {
+    //     method: 'POST',
+    //     body : "From Client"
+    //   });
+    // }    
+  </script>
+
+  </body>
