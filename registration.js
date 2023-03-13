@@ -2,6 +2,7 @@ var sql = require('mysql');
 var http = require('http');
 var fs  = require('fs').promises;
 var qs = require('qs');
+const { Console } = require('console');
 
 
 function creatConnection() {
@@ -26,38 +27,71 @@ const requestHandler = function(req, res) {
         if(req.method === 'POST') {
             req.on('data', function(chunk){
                 body+=chunk;
+                // console.log(chunk);
             });
-            // if(req.method === 'POST')
-            // {
-                // console.log(req);
-            //     console.log(req.body);
-    
-    
-            // }
             req.on('end', function () {
-                var connection = creatConnection();
-                var json = qs.parse(body);
-                console.log(json.username);
-                console.log(json.pwd);
+                var requestedData = JSON.parse(body);
+                    console.log(requestedData);
+                            var connection = creatConnection();
+                    // var json = qs.parse(body);
+                    console.log(requestedData.Username);
+                    // console.log(json.pwd);
 
-                console.log(json.emailAddr);
+                    // console.log(json.emailAddr);
 
-                connection.connect(function (err) {
-                    var sql = "insert into users values(?,?,?)";
-                    connection.query(sql, [json.username, json.pwd, json.emailAddr], function (err, result) { //query SQL database
-                        if(err) return err;
-                        console.log(result);
+                    connection.connect(function (err) {
+                        var sql = "insert into users values(?,?,?)";
+                        connection.query(sql, [requestedData.Username, requestedData.Password, requestedData.EmailAddress], function (err, result) { //query SQL database
+                            if(err) return err;
+                            console.log(result);
+                        });
+                        connection.end();
+
+                        // res.end(contents);
+
                     });
-                    connection.end();
+                    // console.log(json);
 
-                    res.end(contents);
-
-                });
-                console.log(json);
-                
-              }); 
+            });
 
         }
+        res.end(contents);
+    
+        // if(req.method === 'POST') {
+        //     req.on('data', function(chunk){
+        //         body+=chunk;
+        //     });
+        //     // if(req.method === 'POST')
+        //     // {
+        //         // console.log(req);
+        //     //     console.log(req.body);
+    
+    
+        //     // }
+        //     req.on('end', function () {
+        //         var connection = creatConnection();
+        //         var json = qs.parse(body);
+        //         console.log(json.username);
+        //         console.log(json.pwd);
+
+        //         console.log(json.emailAddr);
+
+        //         connection.connect(function (err) {
+        //             var sql = "insert into users values(?,?,?)";
+        //             connection.query(sql, [json.username, json.pwd, json.emailAddr], function (err, result) { //query SQL database
+        //                 if(err) return err;
+        //                 console.log(result);
+        //             });
+        //             connection.end();
+
+        //             res.end(contents);
+
+        //         });
+        //         console.log(json);
+                
+        //       }); 
+
+        //}
         
         
     })

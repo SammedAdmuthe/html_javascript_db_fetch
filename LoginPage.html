@@ -1,24 +1,24 @@
  <body>
- <form id="regForm" method="post" action="/">
+ <form id="regForm" class="form" method="post">
   <fieldset>
    <legend>Create New Account</legend>
    <p>
-    <label>Email Address: <input type="email" name="emailAddr" required onblur="checkExists()"
+    <label>Email Address: <input type="email" id="emailAddr" required onblur="checkExists()"
      placeholder="An email will be sent to this address requiring you
      to confirm its receipt to activate your account" /></label>
    </p>
    <p>
-    <label>Username: <input type="text" name="username" required onblur="checkAvailable()"
+    <label>Username: <input type="text" id="username" required onblur="checkAvailable()"
      placeholder="Username must be at least 8 characters long
      and include only letters or numbers" /></label>
    </p>
    <p>
-    <label>Password: <input type="password" name="pwd" required onblur="checkStrength()"
+    <label>Password: <input type="password" id="pwd" required onblur="checkStrength()"
      placeholder="Password must be at least 8 characters long
      and include numbers and punctuation characters" /></label>
    </p>
    <p>
-    <label>Confirm Password: <input type="password" name="confPwd" required onblur="checkEqual()" /></label>
+    <label>Confirm Password: <input type="password" id="confPwd" required onblur="checkEqual()" /></label>
    </p>
    <p>
      <fieldset>
@@ -32,6 +32,36 @@
  </form>
 
  <script>
+    const myForm = document.getElementById('regForm');
+    console.log("Myform");
+    console.log(myForm);
+    myForm.addEventListener('submit', function(e){
+      //Prevent Page from reloading or navigating away.
+       e.preventDefault();
+
+
+        const formData = new FormData(myForm);
+        console.log(formData);
+        // extract password
+        var pass = document.getElementById("pwd").value;
+
+        // extract username
+        var username = document.getElementById("username").value;
+
+        // extract email address
+        var emailAddr = document.getElementById("emailAddr").value;
+
+        // var confpass = document.getElementById("confPwd").value;
+        fetch('http://localhost:8080/', {
+          method: 'POST',
+          body : JSON.stringify({"Username" : username, "EmailAddress" : emailAddr, "Password":pass})
+        }).then(function (response){
+          return response.text();
+        }).then(function(text){
+          console.log("text!!!!!");
+          console.log(text);
+        });
+    });
     function checkEqual() {
       var pass = document.getElementById("pwd").value;
       var confpass = document.getElementById("confPwd").value;
@@ -50,12 +80,17 @@
 
     // function sendData(){
     //   console.log("In sendData");
-    //   var pass = document.getElementById("pwd").value = "";
+    //   var pass = document.getElementById("pwd").value;
     //   var confpass = document.getElementById("confPwd").value;
-    //   fetch('http://localhost:8080/success.html', {
+    //   fetch('http://localhost:8080/', {
     //     method: 'POST',
-    //     body : "From Client"
-    //   });
+    //     headers: {
+    //       'Content-Type':'application/json'
+    //     },
+    //     body : JSON.stringify({
+    //       name : 'User 1'
+    //     })
+    //   }).then;
     // }    
   </script>
 
