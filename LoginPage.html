@@ -1,62 +1,142 @@
- <body>
- <form id="regForm" method="post" action="/">
-  <fieldset>
-   <legend>Create New Account</legend>
+<body>
+  <form id="regForm" class="form" method="post" action="success.html">
+   <fieldset>
+    <legend>Create New Account</legend>
+    <p>
+     <label>Email Address: <input type="email" id="emailAddr" required
+      placeholder="An email will be sent to this address requiring you
+      to confirm its receipt to activate your account" onblur="checkEmail()"/>
+      <span id="emailInvalidError" style="display: none; color: red;">Invalid email.</span>
+      <span id="emailTakenError" style="display: none; color: red;">Email taken.</span>
+    </label>
+    </p>
+    <p>
+     <label>Username: <input type="text" id="username" required
+      placeholder="Username must be at least 8 characters long
+      and include only letters or numbers" /></label>
+    </p>
+    <p>
+     <label>Password: <input type="password" id="pwd" required
+       placeholder="Password must be at least 8 characters long
+      and include numbers and punctuation characters" /></label>
+    </p>
+    <p>
+     <label>Confirm Password: <input type="password" id="confPwd" required onblur="checkEqual()" /></label>
+    </p>
+    <p>
+      <fieldset>
+        <label><input type="checkbox" name="robotChk" />I'm not a robot</label>
+      </fieldset>
+   </fieldset>
    <p>
-    <label>Email Address: <input type="email" name="emailAddr" required onblur="checkExists()"
-     placeholder="An email will be sent to this address requiring you
-     to confirm its receipt to activate your account" /></label>
+   <input type="reset" value="Reset" /> &nbsp;&nbsp;
+   <input type="submit" id="registerSubmit" value="Create Account"/>
    </p>
-   <p>
-    <label>Username: <input type="text" name="username" required onblur="checkAvailable()"
-     placeholder="Username must be at least 8 characters long
-     and include only letters or numbers" /></label>
-   </p>
-   <p>
-    <label>Password: <input type="password" name="pwd" required onblur="checkStrength()"
-     placeholder="Password must be at least 8 characters long
-     and include numbers and punctuation characters" /></label>
-   </p>
-   <p>
-    <label>Confirm Password: <input type="password" name="confPwd" required onblur="checkEqual()" /></label>
-   </p>
-   <p>
-     <fieldset>
-       <label><input type="checkbox" name="robotChk" onclick="notARobot()" />I'm not a robot</label>
-     </fieldset>
-  </fieldset>
-  <p>
-  <input type="reset" value="Reset" /> &nbsp;&nbsp;
-  <input type="submit" id="registerSubmit" value="Create Account"/>
-  </p>
- </form>
+  </form>
+ 
+  <script>
+     const myForm = document.getElementById('regForm');
+     console.log("My form");
+     console.log(myForm);
+     console.log("In script");
+     myForm.addEventListener('submit', function(e){
+       //Prevent Page from reloading or navigating away.
+        // e.preventDefault();
+ 
+ 
+         const formData = new FormData(myForm);
+        //  console.log(formData);
+         // extract password
+         var pass = document.getElementById("pwd").value;
+ 
+         // extract username
+         var username = document.getElementById("username").value;
+ 
+         // extract email address
+         var emailAddr = document.getElementById("emailAddr").value;
+ 
+         // var confpass = document.getElementById("confPwd").value;
+         fetch('http://localhost:8081/', {
+           method: 'POST',
+           body : JSON.stringify({"Username" : username, "EmailAddress" : emailAddr, "Password":pass})
+         }).then(function (response){
+          // console.log("text!!!!!");
+           return response.text();
+         }).then(function(text){
+          //  console.log("text!1!!!!");
+          $(this).unbind('submit').submit()
 
- <script>
-    function checkEqual() {
-      var pass = document.getElementById("pwd").value;
-      var confpass = document.getElementById("confPwd").value;
+           console.log(text);
+         });
+     });
+     function checkEqual() {
+       var pass = document.getElementById("pwd").value;
+       var confpass = document.getElementById("confPwd").value;
+ 
+       if(pass!=="" && pass === confpass) {
+         console.log("success");
+       }
+       else{
+         console.log("failure");
+         document.getElementById("pwd").value = "";
+         document.getElementById("confPwd").value = "";
+       }
+ 
+ 
+     }
+ 
 
-      if(pass!=="" && pass === confpass) {
-        console.log("success");
-      }
-      else{
-        console.log("failure");
-        document.getElementById("pwd").value = "";
-        document.getElementById("confPwd").value = "";
-      }
+    // const checkEmail = async () => {
+    //     let email = document.getElementById("email");
+    //     let emailRegex = /^[^@]+@[^@]+\.[^@]+$/;
+    //     let emailInvalidError = document.getElementById("emailInvalidError");
+    //     let emailTakenError = document.getElementById("emailTakenError");
 
-
-    }
-
-    // function sendData(){
-    //   console.log("In sendData");
-    //   var pass = document.getElementById("pwd").value = "";
-    //   var confpass = document.getElementById("confPwd").value;
-    //   fetch('http://localhost:8080/success.html', {
-    //     method: 'POST',
-    //     body : "From Client"
-    //   });
-    // }    
-  </script>
-
-  </body>
+    //     if (!emailRegex.test(email.value)) {
+    //         emailInvalidError.style.display = "inline";
+    //         email.style.border = "2px solid #ee6d69";
+    //         emailTakenError.style.display = "none";
+    //         form[0] = 0;
+    //         checkAll();
+    //         return;
+    //     } else {
+    //         emailInvalidError.style.display = "none";
+    //     }
+    //     let check = await fetch("/customer/checkExists", {
+    //         headers: {
+    //             'Content-Type': 'application/json'
+    //         },
+    //         method: "POST",
+    //         body: JSON.stringify({ email: email.value }),
+    //     });
+    //     check = await check.json();
+    //     if (check.exists) {
+    //         emailTakenError.style.display = "inline";
+    //         email.style.border = "2px solid #ee6d69";
+    //         form[0] = 0;
+    //         checkAll();
+    //         return;
+    //     } else {
+    //         emailTakenError.style.display = "none";
+    //         email.style.border = "2px solid #47cc55";
+    //         form[0] = 1;
+    //         checkAll();
+    //     }
+    // }
+    //  function sendData(){
+    //    console.log("In sendData");
+    //    var pass = document.getElementById("pwd").value;
+    //    var confpass = document.getElementById("confPwd").value;
+    //    fetch('http://localhost:8080/', {
+    //      method: 'POST',
+    //      headers: {
+    //        'Content-Type':'application/json'
+    //      },
+    //      body : JSON.stringify({
+    //        name : 'User 1'
+    //      })
+    //    }).then;
+    //  }    
+   </script>
+ 
+   </body>
