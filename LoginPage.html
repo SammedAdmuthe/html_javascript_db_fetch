@@ -16,12 +16,14 @@
       and include only letters or numbers" /></label>
     </p>
     <p>
-     <label>Password: <input type="password" id="pwd" required
+     <label>Password: <input type="password" id="pwd" required onblur="checkEqual()" 
        placeholder="Password must be at least 8 characters long
       and include numbers and punctuation characters" /></label>
     </p>
     <p>
      <label>Confirm Password: <input type="password" id="confPwd" required onblur="checkEqual()" /></label>
+     <span id="passwordConfirmationError" style="display: none; color: red;">Passwords donot match.</span>
+
     </p>
     <p>
       <fieldset>
@@ -72,57 +74,62 @@
      function checkEqual() {
        var pass = document.getElementById("pwd").value;
        var confpass = document.getElementById("confPwd").value;
- 
+       let passwordConfirmationError = document.getElementById("passwordConfirmationError");
+
        if(pass!=="" && pass === confpass) {
-         console.log("success");
+        passwordConfirmationError.style.display = "none";
+
+        console.log("success");
        }
        else{
          console.log("failure");
-         document.getElementById("pwd").value = "";
-         document.getElementById("confPwd").value = "";
+         passwordConfirmationError.style.display = "inline";
+        //  document.getElementById("pwd").value = "";
+        //  document.getElementById("confPwd").value = "";
        }
  
  
      }
  
 
-    // const checkEmail = async () => {
-    //     let email = document.getElementById("email");
-    //     let emailRegex = /^[^@]+@[^@]+\.[^@]+$/;
-    //     let emailInvalidError = document.getElementById("emailInvalidError");
-    //     let emailTakenError = document.getElementById("emailTakenError");
+    const checkEmail = async () => {
+        let email = document.getElementById("emailAddr");
+        let emailRegex = /^[^@]+@[^@]+\.[^@]+$/;
+        let emailInvalidError = document.getElementById("emailInvalidError");
+        let emailTakenError = document.getElementById("emailTakenError");
 
-    //     if (!emailRegex.test(email.value)) {
-    //         emailInvalidError.style.display = "inline";
-    //         email.style.border = "2px solid #ee6d69";
-    //         emailTakenError.style.display = "none";
-    //         form[0] = 0;
-    //         checkAll();
-    //         return;
-    //     } else {
-    //         emailInvalidError.style.display = "none";
-    //     }
-    //     let check = await fetch("/customer/checkExists", {
-    //         headers: {
-    //             'Content-Type': 'application/json'
-    //         },
-    //         method: "POST",
-    //         body: JSON.stringify({ email: email.value }),
-    //     });
-    //     check = await check.json();
-    //     if (check.exists) {
-    //         emailTakenError.style.display = "inline";
-    //         email.style.border = "2px solid #ee6d69";
-    //         form[0] = 0;
-    //         checkAll();
-    //         return;
-    //     } else {
-    //         emailTakenError.style.display = "none";
-    //         email.style.border = "2px solid #47cc55";
-    //         form[0] = 1;
-    //         checkAll();
-    //     }
-    // }
+        if (!emailRegex.test(email.value)) {
+            emailInvalidError.style.display = "inline";
+            email.style.border = "2px solid #ee6d69";
+            emailTakenError.style.display = "none";
+            form[0] = 0;
+            // checkAll();
+            return;
+        } else {
+            emailInvalidError.style.display = "none";
+        }
+        let check = await fetch("/checkExists", {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            method: "POST",
+            body: JSON.stringify({ "EmailAddress": email.value }),
+        });
+        check = await check.json();
+        console.log(check);
+        if (check) {
+            emailTakenError.style.display = "inline";
+            email.style.border = "2px solid #ee6d69";
+            form[0] = 0;
+            // checkAll();
+            return;
+        } else {
+            emailTakenError.style.display = "none";
+            email.style.border = "2px solid #47cc55";
+            form[0] = 1;
+            // checkAll();
+        }
+    }
     //  function sendData(){
     //    console.log("In sendData");
     //    var pass = document.getElementById("pwd").value;

@@ -79,14 +79,14 @@ const server = http.createServer((req, res)=>{
         if(req.method === 'POST') {
             req.on('data', function(chunk){
                 body+=chunk;
-                console.log(chunk);
+                // console.log(chunk);
             });
             req.on('end', function () {
                 var requestedData = JSON.parse(body);
-                    console.log(requestedData);
+                    // console.log(requestedData);
                             var connection = creatConnection();
                     // var json = qs.parse(body);
-                    console.log(requestedData.Username);
+                    // console.log(requestedData.Username);
                     // console.log(json.pwd);
 
                     // console.log(json.emailAddr);
@@ -113,7 +113,49 @@ const server = http.createServer((req, res)=>{
     else if(url == '/success.html') {
         
         res.end(successPage);
-    } 
+    }
+    else if(url == '/checkExists') {
+        var body='';    
+        var returnValue = "false";
+
+        if(req.method === 'POST') {
+            req.on('data', function(chunk){
+                body+=chunk;
+                // console.log(chunk);
+            });
+            req.on('end', function () {
+                var requestedData = JSON.parse(body);
+                    // console.log(requestedData);
+                            var connection = creatConnection();
+                    // var json = qs.parse(body);
+                    // console.log(requestedData.Username);
+                    // console.log(json.pwd);
+                    // console.log(json.emailAddr);
+                    connection.connect(function (err) {
+                        var sql = "select * from users where emailAddress = ?";
+                        connection.query(sql, [requestedData.EmailAddress], function (err, result) { //query SQL database
+                            if(err) return err;
+                            if(result.length===0)
+                            {
+                                returnValue = "false";
+                            }
+                            else{
+                                returnValue = "true";
+                            }
+                            res.end(returnValue);
+                        });
+                        // window.location.href = "success.html";
+                        connection.end();
+
+                        // res.end(contents);
+
+                    });
+                    // console.log(json);
+
+            });
+
+        }
+    }
 });
 
 server.listen(8081);
