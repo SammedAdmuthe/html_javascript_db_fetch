@@ -11,9 +11,11 @@
     </label>
     </p>
     <p>
-     <label>Username: <input type="text" id="username" required
+     <label>Username: <input type="text" id="username" required onblur="checkUserName()"
       placeholder="Username must be at least 8 characters long
       and include only letters or numbers" /></label>
+      <span id="usernameError" style="display: none; color: red;">Enter Username.</span>
+
     </p>
     <p>
      <label>Password: <input type="password" id="pwd" required onblur="checkEqual()" 
@@ -37,10 +39,14 @@
   </form>
  
   <script>
+    var promises = Array(3).fill(Promise.reject());
      const myForm = document.getElementById('regForm');
      console.log("My form");
      console.log(myForm);
      console.log("In script");
+     window.addEventListener('load', function(e){
+        document.getElementById('registerSubmit').disabled = true;
+     });
      myForm.addEventListener('submit', function(e){
        //Prevent Page from reloading or navigating away.
         // e.preventDefault();
@@ -58,7 +64,7 @@
          var emailAddr = document.getElementById("emailAddr").value;
  
          // var confpass = document.getElementById("confPwd").value;
-         fetch('http://localhost:8081/', {
+         fetch('http://localhost:8082/', {
            method: 'POST',
            body : JSON.stringify({"Username" : username, "EmailAddress" : emailAddr, "Password":pass})
          }).then(function (response){
@@ -78,21 +84,51 @@
 
        if(pass!=="" && pass === confpass) {
         passwordConfirmationError.style.display = "none";
+        promises[2] = Promise.resolve(1);
 
         console.log("success");
        }
        else{
          console.log("failure");
+         promises[2] = Promise.reject(new Error("An error occured"));
          passwordConfirmationError.style.display = "inline";
         //  document.getElementById("pwd").value = "";
         //  document.getElementById("confPwd").value = "";
        }
- 
+       checkPromises(promises);
  
      }
- 
 
-    const checkEmail = async () => {
+    function checkUserName() {
+      var username = document.getElementById("username").value;
+      
+      var usernameError = document.getElementById("usernameError");
+      if(username != "") {
+        usernameError.style.display = "none";
+        promises[1] = Promise.resolve(1);
+
+      }
+      else{
+        usernameError.style.display = "inline";
+        promises[1] = Promise.reject(new Error("An error occured"));
+
+      }
+      checkPromises(promises);
+     }
+
+    function checkPromises() {
+      Promise.all(promises)
+          .then(results => {
+            document.getElementById('registerSubmit').disabled = false;
+          })
+          .catch(error => {
+            document.getElementById('registerSubmit').disabled = true;
+            console.error(error);
+          });
+    }
+
+    async function checkEmail(){
+      // promises=[]
         let email = document.getElementById("emailAddr");
         let emailRegex = /^[^@]+@[^@]+\.[^@]+$/;
         let emailInvalidError = document.getElementById("emailInvalidError");
@@ -102,7 +138,7 @@
             emailInvalidError.style.display = "inline";
             email.style.border = "2px solid #ee6d69";
             emailTakenError.style.display = "none";
-            form[0] = 0;
+            // form[0] = 0;
             // checkAll();
             return;
         } else {
@@ -116,20 +152,30 @@
             body: JSON.stringify({ "EmailAddress": email.value }),
         });
         check = await check.json();
-        console.log(check);
+        // console.log(check);
         if (check) {
             emailTakenError.style.display = "inline";
             email.style.border = "2px solid #ee6d69";
-            form[0] = 0;
+            // form[0] = 0;
             // checkAll();
-            return;
+            // promise1 = Promise.reject(new Error("An error occured"));
+            promises[0] = Promise.reject(new Error("An error occured"));
+            // return;
         } else {
             emailTakenError.style.display = "none";
             email.style.border = "2px solid #47cc55";
-            form[0] = 1;
+            // promise1 = Promise.resolve(1);
+
+            promises[0] = Promise.resolve(1);
+            // form[0] = 1;
             // checkAll();
         }
+        checkPromises(promises);
+        // Promise.all(promise1).then(document.getElementById('registerSubmit').disabled = false).catch(document.getElementById('registerSubmit').disabled = true);
+
     }
+
+    
     //  function sendData(){
     //    console.log("In sendData");
     //    var pass = document.getElementById("pwd").value;
@@ -143,7 +189,7 @@
     //        name : 'User 1'
     //      })
     //    }).then;
-    //  }    
+    //  }
    </script>
  
    </body>
