@@ -1,26 +1,94 @@
+<head>
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .form {
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    fieldset {
+      border: none;
+      padding: 0;
+    }
+
+    legend {
+      font-size: 1.2em;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    input[type="email"],
+    input[type="text"],
+    input[type="password"],
+    input[type="checkbox"] {
+      width: 100%;
+      padding: 8px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+
+    span.error {
+      display: none;
+      color: red;
+      margin-top: 5px;
+    }
+
+    input[type="submit"],
+    input[type="reset"] {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      text-decoration: none;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    input[type="submit"]:disabled,
+    input[type="reset"]:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+  </style>
+
+</head>
+
 <body>
   <form id="regForm" class="form" method="post" action="success.html">
    <fieldset>
     <legend>Create New Account</legend>
     <p>
      <label>Email Address: <input type="email" id="emailAddr" required
-      placeholder="An email will be sent to this address requiring you
-      to confirm its receipt to activate your account" onblur="checkEmail()"/>
+      placeholder="An email will be sent to this address" onblur="checkEmail()"/>
       <span id="emailInvalidError" style="display: none; color: red;">Invalid email.</span>
       <span id="emailTakenError" style="display: none; color: red;">Email taken.</span>
     </label>
     </p>
     <p>
      <label>Username: <input type="text" id="username" required onblur="checkUserName()"
-      placeholder="Username must be at least 8 characters long
-      and include only letters or numbers" /></label>
+      placeholder="Username must be at least 8 characters long" /></label>
       <span id="usernameError" style="display: none; color: red;">Enter Username.</span>
 
     </p>
     <p>
      <label>Password: <input type="password" id="pwd" required onblur="checkEqual()" 
-       placeholder="Password must be at least 8 characters long
-      and include numbers and punctuation characters" /></label>
+       placeholder="Password must be at least 8 characters long" /></label>
+       <span id="validatePasswordError" style="display: none; color: red;">Passwords should be 8 characters long and must be alphanumeric.</span>
+
     </p>
     <p>
      <label>Confirm Password: <input type="password" id="confPwd" required onblur="checkEqual()" /></label>
@@ -28,13 +96,17 @@
 
     </p>
     <p>
-      <fieldset>
+      <!-- <fieldset>
         <label><input type="checkbox" name="robotChk" />I'm not a robot</label>
-      </fieldset>
+      </fieldset> -->
    </fieldset>
    <p>
    <input type="reset" value="Reset" /> &nbsp;&nbsp;
    <input type="submit" id="registerSubmit" value="Create Account"/>
+   </p>
+   <p>
+    <div class="g-recaptcha" data-sitekey="6LcxmvomAAAAANP-WRgsKueoFtZlEcojLD2IvpJ_"></div>
+
    </p>
   </form>
  
@@ -77,14 +149,36 @@
            console.log(text);
          });
      });
+     function validatePassword() {
+        var pass = document.getElementById("pwd").value;
+        const alphanumericRegex = /^[a-zA-Z0-9]+$/;
+        if (pass.length >= 8 && alphanumericRegex.test(pass)) {
+          return true;
+        }
+        return false;
+     }
      function checkEqual() {
-       var pass = document.getElementById("pwd").value;
-       var confpass = document.getElementById("confPwd").value;
+       var pass = document.getElementById("pwd");
+       var confpass = document.getElementById("confPwd");
        let passwordConfirmationError = document.getElementById("passwordConfirmationError");
+       let validatePasswordError= document.getElementById("validatePasswordError");
+       if(!validatePassword()) {
+        promises[2] = Promise.reject(new Error("An error occured"));
+        validatePasswordError.style.display = "inline";
+        pass.style.border = "2px solid #ee6d69";
+        return;
+       }
+       else{
+        validatePasswordError.style.display = "none";
+        promises[2] = Promise.resolve(1);
+        pass.style.border = "2px solid #47cc55";
+       }
 
-       if(pass!=="" && pass === confpass) {
+       if(pass.value!=="" && pass.value === confpass.value) {
         passwordConfirmationError.style.display = "none";
         promises[2] = Promise.resolve(1);
+        pass.style.border = "2px solid #47cc55";
+        confpass.style.border = "2px solid #47cc55";
 
         console.log("success");
        }
@@ -92,6 +186,9 @@
          console.log("failure");
          promises[2] = Promise.reject(new Error("An error occured"));
          passwordConfirmationError.style.display = "inline";
+         pass.style.border = "2px solid #ee6d69";
+         confpass.style.border = "2px solid #ee6d69";
+
         //  document.getElementById("pwd").value = "";
         //  document.getElementById("confPwd").value = "";
        }
@@ -100,16 +197,19 @@
      }
 
     function checkUserName() {
-      var username = document.getElementById("username").value;
+      var username = document.getElementById("username");
       
       var usernameError = document.getElementById("usernameError");
-      if(username != "") {
+      if(username.value != "") {
         usernameError.style.display = "none";
+        username.style.border = "2px solid #47cc55";
         promises[1] = Promise.resolve(1);
 
       }
       else{
         usernameError.style.display = "inline";
+        username.style.border = "2px solid #ee6d69";
+
         promises[1] = Promise.reject(new Error("An error occured"));
 
       }
